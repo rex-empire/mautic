@@ -5,6 +5,11 @@ pwd
 ls -la /
 echo >&2 "ITC2"
 
+composer update --with-all-dependencies
+chown -R www-data:www-data .
+
+echo >&2 "ITC3"
+
 set -e
 
 if [ ! -f /usr/local/etc/php/php.ini ]; then

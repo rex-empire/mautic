@@ -87,23 +87,24 @@ ENV PHP_INI_DATE_TIMEZONE='UTC' \
 COPY docker/mautic.crontab /etc/cron.d/mautic
 RUN chmod 644 /etc/cron.d/mautic
 
+#VOLUME /var/www/html
 
 #RUN mkdir /usr/src/mautic
 #WORKDIR /usr/src/mautic
 COPY . .
-RUN chown -R www-data:www-data .
-
-
 #RUN composer install
 
-VOLUME /var/www/html
 
 #WORKDIR /var/www/html
 #COPY docker/docker-entrypoint.sh ./entrypoint.sh
 #COPY docker/makeconfig.php ./makeconfig.php
 #COPY docker/makedb.php ./makedb.php
 
-RUN composer update --with-all-dependencies
+RUN chown -R www-data:www-data .
+
+#RUN composer update --with-al\l-dependencies
+
+RUN chown -R www-data:www-data .
 
 #RUN chown -R www-data:www-data .
 
@@ -120,3 +121,4 @@ RUN ["chmod", "+x", "/entrypoint.sh"]
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["apache2-foreground"]
+
