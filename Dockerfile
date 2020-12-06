@@ -84,7 +84,7 @@ ENV PHP_INI_DATE_TIMEZONE='UTC' \
 #WORKDIR /var/www/html
 # Copy init scripts and custom .htaccess
 
-COPY docker/mautic.crontab /etc/cron.d/mautic
+COPY mautic.crontab /etc/cron.d/mautic
 RUN chmod 644 /etc/cron.d/mautic
 
 #VOLUME /var/www/html
@@ -111,7 +111,6 @@ RUN chown -R www-data:www-data .
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY makeconfig.php /makeconfig.php
 COPY makedb.php /makedb.php
-COPY mautic.crontab /etc/cron.d/mautic
 
 # Enable Apache Rewrite Module
 RUN a2enmod rewrite
