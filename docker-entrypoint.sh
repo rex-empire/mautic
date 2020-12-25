@@ -1,14 +1,29 @@
 #!/bin/bash
 
-echo >&2 "ITC"
 pwd
-ls -la /
-echo >&2 "ITC2"
+ls -la /var/www/html/var/cache
 
-composer update --with-all-dependencies
-chown -R www-data:www-data .
+echo >&2 "========================== ============================================="
 
-echo >&2 "ITC3"
+ls -la /var/www/html/var/cache/prod
+
+chmod -R 777 var
+chown -R www-data:www-data var
+echo >&2 "=============================================="
+
+ls -la /var/www/html/var/cache/prod
+
+echo >&2 "================START=============================="
+
+composer run-script build
+
+echo >&2 "================DONE=============================="
+ls -la /var/www/html/var/cache/
+ls -la /var/www/html/var/cache/prod
+
+php bin/console doctrine:migrations:migrate --env=prod
+
+#composer run-script clearme
 
 set -e
 
@@ -54,52 +69,6 @@ if [ -z "$MAUTIC_DB_PASSWORD" ]; then
         echo >&2 "  (Also of interest might be MAUTIC_DB_USER and MAUTIC_DB_NAME.)"
         exit 1
 fi
-
-#ENABLES HUBSPOT CRON
-if [ -n "$MAUTIC_CRON_HUBSPOT" ]; then
-        echo >&2 "CRON: Activating Hubspot"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:fetchleads --integration=Hubspot > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-        echo "15,45 * * * *     www-data   php /var/www/html/app/console mautic:integration:pushactivity --integration=Hubspot > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-#ENABLES SALESFORCE CRON
-if [ -n "$MAUTIC_CRON_SALESFORCE" ]; then
-        echo >&2 "CRON: Activating Salesforce"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:fetchleads --integration=Salesforce > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-        echo "12,42 * * * *     www-data   php /var/www/html/app/console mautic:integration:pushactivity --integration=Salesforce > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-        echo "14,44 * * * *     www-data   php /var/www/html/app/console mautic:integration:pushleadactivity --integration=Salesforce > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-        echo "16,46 * * * *     www-data   php /var/www/html/app/console mautic:integration:synccontacts --integration=Salesforce > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-#ENABLES SUGARCRM CRON
-if [ -n "$MAUTIC_CRON_SUGARCRM" ]; then
-        echo >&2 "CRON: Activating SugarCRM"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:fetchleads --fetch-all --integration=Sugarcrm > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-#ENABLES PIPEDRIVE CRON
-if [ -n "$MAUTIC_CRON_PIPEDRIVE" ]; then
-        echo >&2 "CRON: Activating Pipedrive"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:pipedrive:fetch > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-        echo "15,45 * * * *     www-data   php /var/www/html/app/console mautic:integration:pipedrive:push > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-#ENABLES ZOHO CRON
-if [ -n "$MAUTIC_CRON_ZOHO" ]; then
-        echo >&2 "CRON: Activating ZohoCRM"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:fetchleads --integration=Zoho > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-#ENABLES DYNAMICS CRON
-if [ -n "$MAUTIC_CRON_DYNAMICS" ]; then
-        echo >&2 "CRON: Activating DynamicsCRM"
-        echo "10,40 * * * *     www-data   php /var/www/html/app/console mautic:integration:fetchleads -i Dynamics > /var/log/cron.pipe 2>&1" >> /etc/cron.d/mautic
-fi
-
-echo >&2 "FINDME"
-pwd
-ls -la
-echo >&2 "FINDME2"
 
 if ! [ -e index.php -a -e app/AppKernel.php ]; then
         echo >&2 "Mautic not found in $(pwd) - copying now..."
@@ -149,16 +118,12 @@ else
     echo >&2 "Not running cron as requested."
 fi
 
+echo >&2 "=========================== LAST THING ============================================="
+
+php bin/console mautic:plugins:reload
+
 echo >&2
 echo >&2 "========================================================================"
-
-
-# Github Pull Tester
-if [ -n "$MAUTIC_TESTER" ]; then
-  echo >&2 "Copying Mautic Github Pull Tester"
-  wget https://raw.githubusercontent.com/mautic/mautic-tester/master/tester.php
-fi
-
 
 "$@" &
 MAINPID=$!

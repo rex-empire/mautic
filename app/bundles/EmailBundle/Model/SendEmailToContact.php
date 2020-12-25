@@ -154,6 +154,8 @@ class SendEmailToContact
      */
     public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
     {
+        error_log('setEmail erino');
+
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -226,6 +228,7 @@ class SendEmailToContact
      */
     public function send()
     {
+        error_log('SENDERINO');
         if ($this->mailer->inTokenizationMode()) {
             list($success, $errors) = $this->queueTokenizedEmail();
         } else {

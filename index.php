@@ -1,6 +1,6 @@
 <?php
 
-$_SERVER['HTTPS'] = 'on';
+//$_SERVER['HTTPS'] = 'on';
 
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved

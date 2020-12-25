@@ -15,7 +15,7 @@
         <img class="img img-responsive" style="margin: auto;" src="<?php echo $view['assets']->getUrl($icon); ?>" />
     </div>
 
-    <div class="col-xs-8">
+    <div class="col-xs-8 findme">
         <h3>
             <?php echo $bundle->getPrimaryDescription(); ?>
         </h3>

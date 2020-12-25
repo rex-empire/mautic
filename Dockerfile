@@ -52,13 +52,11 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/lib --with-png-dir=/usr
     && docker-php-ext-install intl mbstring mysqli curl pdo_mysql zip opcache bcmath gd \
     && docker-php-ext-enable intl mbstring mysqli curl pdo_mysql zip opcache bcmath gd
 
+ENV COMPOSER_DEBUG_EVENTS 1
+
 # Install composer
-#RUN curl -sS https://getcomposer.org/download/1.10.19/composer.phar
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php --1 --install-dir=/usr/bin --filename=composer
-#| php -- --install-dir=/usr/bin --filename=composer
-
-# Define Mautic volume to persist data
 
 # Define Mautic version and expected SHA1 signature
 ENV MAUTIC_VERSION 3.0.2
@@ -79,35 +77,23 @@ ENV PHP_INI_DATE_TIMEZONE='UTC' \
     PHP_MAX_UPLOAD=512M \
     PHP_MAX_EXECUTION_TIME=300
 
-
-
-#WORKDIR /var/www/html
-# Copy init scripts and custom .htaccess
-
 COPY mautic.crontab /etc/cron.d/mautic
 RUN chmod 644 /etc/cron.d/mautic
 
-#VOLUME /var/www/html
+WORKDIR /var/www/html
 
-#RUN mkdir /usr/src/mautic
-#WORKDIR /usr/src/mautic
-COPY . .
-#RUN composer install
+RUN mkdir var
+RUN mkdir var/cache
+RUN mkdir var/cache/prod
+RUN chmod -R 777 var
 
-
-#WORKDIR /var/www/html
-#COPY docker/docker-entrypoint.sh ./entrypoint.sh
-#COPY docker/makeconfig.php ./makeconfig.php
-#COPY docker/makedb.php ./makedb.php
-
+COPY composer.json composer.json
+RUN composer install
 RUN chown -R www-data:www-data .
 
-#RUN composer update --with-al\l-dependencies
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
-RUN chown -R www-data:www-data .
-
-#RUN chown -R www-data:www-data .
-
+COPY --chown=www-data:www-data . .
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY makeconfig.php /makeconfig.php
 COPY makedb.php /makedb.php

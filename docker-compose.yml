@@ -24,7 +24,8 @@ services:
     ports:
       - 8081:80
     volumes:
-      - mautic_data2:/var/www/html
+      - mautic_data:/var/www/html/saved
+#      - ./:/var/www/html
     environment:
       - MAUTIC_DB_HOST=mauticdb
       - MYSQL_PORT_3306_TCP=3306
@@ -32,13 +33,14 @@ services:
       - MAUTIC_DB_PASSWORD=mysecret
       - MAUTIC_DB_NAME=mautic
       - MAUTIC_RUN_CRON_JOBS=true
+      - COMPOSER_DEBUG_EVENTS=1
     networks:
       - mautic-net
 
 volumes:
   mysql_data:
     driver: local
-  mautic_data2:
+  mautic_data:
     driver: local
 
 networks:
