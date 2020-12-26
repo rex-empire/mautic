@@ -4,6 +4,8 @@ services:
 
   mauticdb:
     image: percona/percona-server:5.7
+    ports:
+      - 6969:3306
     container_name: mauticdb
     volumes:
       - mysql_data:/var/lib/mysql
@@ -24,7 +26,7 @@ services:
     ports:
       - 8081:80
     volumes:
-      - mautic_data:/var/www/html/saved
+      - mautic_data:/var/www/html/app/saved
 #      - ./:/var/www/html
     environment:
       - MAUTIC_DB_HOST=mauticdb
@@ -32,10 +34,16 @@ services:
       - MAUTIC_DB_USER=root
       - MAUTIC_DB_PASSWORD=mysecret
       - MAUTIC_DB_NAME=mautic
-      - MAUTIC_RUN_CRON_JOBS=true
+      - MAUTIC_ENV=dev
+      - MAUTIC_RUN_CRON_JOBS=false
       - COMPOSER_DEBUG_EVENTS=1
     networks:
       - mautic-net
+#    logging:
+#      driver: gelf
+#      options:
+#        gelf-address: udp://172.16.0.38:12201
+#        labels: container_group
 
 volumes:
   mysql_data:

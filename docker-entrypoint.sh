@@ -42,11 +42,16 @@ fi
 php /makedb.php "$MAUTIC_DB_HOST" "$MAUTIC_DB_USER" "$MAUTIC_DB_PASSWORD" "$MAUTIC_DB_NAME"
 
 # Write the database connection to the config so the installer prefills it
-if ! [ -e app/config/local.php ]; then
+if ! [ -e saved/local.php ]; then
         php /makeconfig.php
-        chown www-data:www-data app/config/local.php
+
+        chown www-data:www-data /var/www/html/app/saved/local.php
+        chmod -R 777 /var/www/html/app/saved/
+        chmod -R 777 /var/www/html/app/saved/local.php
+
         mkdir -p /var/www/html/app/logs
         chown -R www-data:www-data /var/www/html/app/logs
+        chown -R www-data:www-data /var/www/html/app/saved
 fi
 
 if [[ "$MAUTIC_RUN_CRON_JOBS" == "true" ]]; then
