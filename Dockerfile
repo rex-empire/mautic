@@ -98,6 +98,19 @@ COPY docker-entrypoint.sh /entrypoint.sh
 COPY makeconfig.php /makeconfig.php
 COPY makedb.php /makedb.php
 
+RUN tail -500 /var/www/html/app/bundles/CoreBundle/Monolog/Handler/GelfyHandler.php
+
+# the very first task at composer which executes code in your symfony project.
+RUN composer run-script build
+RUN composer run-script clearme
+#RUN php bin/console mautic:plugins:reload
+
+RUN ls -la var/cache
+RUN ls -la var/cache/prod
+
+RUN chmod -R 777 var
+#RUN chown -R www-data:www-data .
+
 # Enable Apache Rewrite Module
 RUN a2enmod rewrite
 

@@ -15,13 +15,12 @@ ls -la /var/www/html/var/cache/prod
 
 echo >&2 "================START=============================="
 
-composer run-script build
+#composer run-script build
 
 echo >&2 "================DONE=============================="
 ls -la /var/www/html/var/cache/
 ls -la /var/www/html/var/cache/prod
 
-php bin/console doctrine:migrations:migrate --env=prod
 
 #composer run-script clearme
 
@@ -39,70 +38,15 @@ max_execution_time = ${PHP_MAX_EXECUTION_TIME}
 EOF
 fi
 
-
-if [ -n "$MYSQL_PORT_3306_TCP" ]; then
-        if [ -z "$MAUTIC_DB_HOST" ]; then
-                export MAUTIC_DB_HOST='mysql'
-                if [ "$MAUTIC_DB_USER" = 'root' ] && [ -z "$MAUTIC_DB_PASSWORD" ]; then
-                        export MAUTIC_DB_PASSWORD="$MYSQL_ENV_MYSQL_ROOT_PASSWORD"
-                fi
-        else
-                echo >&2 "warning: both MAUTIC_DB_HOST and MYSQL_PORT_3306_TCP found"
-                echo >&2 "  Connecting to MAUTIC_DB_HOST ($MAUTIC_DB_HOST)"
-                echo >&2 "  instead of the linked mysql container"
-        fi
-fi
-
-
-if [ -z "$MAUTIC_DB_HOST" ]; then
-        echo >&2 "error: missing MAUTIC_DB_HOST and MYSQL_PORT_3306_TCP environment variables"
-        echo >&2 "  Did you forget to --link some_mysql_container:mysql or set an external db"
-        echo >&2 "  with -e MAUTIC_DB_HOST=hostname:port?"
-        exit 1
-fi
-
-
-if [ -z "$MAUTIC_DB_PASSWORD" ]; then
-        echo >&2 "error: missing required MAUTIC_DB_PASSWORD environment variable"
-        echo >&2 "  Did you forget to -e MAUTIC_DB_PASSWORD=... ?"
-        echo >&2
-        echo >&2 "  (Also of interest might be MAUTIC_DB_USER and MAUTIC_DB_NAME.)"
-        exit 1
-fi
-
-if ! [ -e index.php -a -e app/AppKernel.php ]; then
-        echo >&2 "Mautic not found in $(pwd) - copying now..."
-
-        if [ "$(ls -A)" ]; then
-                echo >&2 "WARNING: $(pwd) is not empty - press Ctrl+C now if this is an error!"
-                ( set -x; ls -A; sleep 10 )
-        fi
-
-        tar cf - --one-file-system -C /usr/src/mautic . | tar xf -
-
-        echo >&2 "Complete! Mautic has been successfully copied to $(pwd)"
-fi
-
 # Ensure the MySQL Database is created
 php /makedb.php "$MAUTIC_DB_HOST" "$MAUTIC_DB_USER" "$MAUTIC_DB_PASSWORD" "$MAUTIC_DB_NAME"
-
-echo >&2 "========================================================================"
-echo >&2
-echo >&2 "This server is now configured to run Mautic!"
-echo >&2 "The following information will be prefilled into the installer (keep password field empty):"
-echo >&2 "Host Name: $MAUTIC_DB_HOST"
-echo >&2 "Database Name: $MAUTIC_DB_NAME"
-echo >&2 "Database Username: $MAUTIC_DB_USER"
-echo >&2 "Database Password: $MAUTIC_DB_PASSWORD"
 
 # Write the database connection to the config so the installer prefills it
 if ! [ -e app/config/local.php ]; then
         php /makeconfig.php
-
-        # Make sure our web user owns the config file if it exists
         chown www-data:www-data app/config/local.php
         mkdir -p /var/www/html/app/logs
-        chown www-data:www-data /var/www/html/app/logs
+        chown -R www-data:www-data /var/www/html/app/logs
 fi
 
 if [[ "$MAUTIC_RUN_CRON_JOBS" == "true" ]]; then
@@ -119,10 +63,17 @@ else
 fi
 
 echo >&2 "=========================== LAST THING ============================================="
+chown -R www-data:www-data var
+chmod -R 777 var
+ls -la /var/www/html/var/cache/
+ls -la /var/www/html/var/cache/prod
 
-php bin/console mautic:plugins:reload
+echo >&2 "============FME===================="
 
-echo >&2
+#php bin/console mautic:plugins:reload
+
+echo >&2 "============/FME===================="
+
 echo >&2 "========================================================================"
 
 "$@" &

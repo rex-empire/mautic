@@ -989,6 +989,13 @@ return [
                 'tag' => 'validator.constraint_validator',
             ],
             // Logger
+//            'mautic.monolog.handler' => [
+//                'class'     => \Mautic\CoreBundle\Monolog\Handler\GelfyHandler::class,
+//                'arguments' => [
+//                    'mautic.helper.core_parameters',
+//                    'mautic.monolog.fulltrace.formatter',
+//                ],
+//            ],
             'mautic.monolog.handler' => [
                 'class'     => \Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
                 'arguments' => [
