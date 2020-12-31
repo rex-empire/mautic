@@ -191,6 +191,9 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0, 'message' => ''];
         $user      = $this->get('mautic.helper.user')->getUser();
 
+        var_dump($dataArray);
+        error_log('**** FINDME 1 ***');
+
         if ($user->isAdmin()) {
             $settings = $request->request->all();
 

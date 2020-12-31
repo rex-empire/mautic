@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:7.4-apache
 
 # Install PHP extensions
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -46,21 +46,19 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-install imap && \
     docker-php-ext-enable imap
 
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/lib --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib \
+RUN docker-php-ext-configure gd \
     && docker-php-ext-install  gd \
     && docker-php-ext-configure opcache --enable-opcache \
-    && docker-php-ext-install intl mbstring mysqli curl pdo_mysql zip opcache bcmath gd \
-    && docker-php-ext-enable intl mbstring mysqli curl pdo_mysql zip opcache bcmath gd
+    && docker-php-ext-install intl mysqli curl pdo_mysql zip opcache bcmath gd \
+    && docker-php-ext-enable intl mysqli curl pdo_mysql zip opcache bcmath gd
 
 ENV COMPOSER_DEBUG_EVENTS 1
+ENV MAUTIC_VERSION 3.0.2
+ENV MAUTIC_SHA1 225dec8fbac05dfb77fdd7ed292a444797db215f
 
 # Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php --1 --install-dir=/usr/bin --filename=composer
-
-# Define Mautic version and expected SHA1 signature
-ENV MAUTIC_VERSION 3.0.2
-ENV MAUTIC_SHA1 225dec8fbac05dfb77fdd7ed292a444797db215f
 
 # By default enable cron jobs
 ENV MAUTIC_RUN_CRON_JOBS true
@@ -101,12 +99,11 @@ COPY makedb.php /makedb.php
 RUN tail -500 /var/www/html/app/bundles/CoreBundle/Monolog/Handler/GelfyHandler.php
 
 # the very first task at composer which executes code in your symfony project.
-RUN composer run-script build
-RUN composer run-script clearme
+
 #RUN php bin/console mautic:plugins:reload
 
-RUN ls -la var/cache
-RUN ls -la var/cache/prod
+#RUN ls -la var/cache
+#RUN ls -la var/cache/prod
 
 RUN chmod -R 777 var
 #RUN chown -R www-data:www-data .

@@ -7,6 +7,9 @@ echo >&2 "========================== ===========================================
 
 ls -la /var/www/html/var/cache/prod
 
+composer run-script build
+composer run-script clearme
+
 chmod -R 777 var
 chown -R www-data:www-data var
 echo >&2 "=============================================="
@@ -42,7 +45,7 @@ fi
 php /makedb.php "$MAUTIC_DB_HOST" "$MAUTIC_DB_USER" "$MAUTIC_DB_PASSWORD" "$MAUTIC_DB_NAME"
 
 # Write the database connection to the config so the installer prefills it
-if ! [ -e saved/local.php ]; then
+if ! [ -e /var/www/html/app/saved/local.php ]; then
         php /makeconfig.php
 
         chown www-data:www-data /var/www/html/app/saved/local.php
