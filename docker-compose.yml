@@ -24,10 +24,9 @@ services:
     depends_on:
       - mauticdb
     ports:
-      - 8081:80
+      - 8089:80
     volumes:
       - mautic_data:/var/www/html/app/saved
-#      - ./:/var/www/html
     environment:
       - MAUTIC_DB_HOST=mauticdb
       - MYSQL_PORT_3306_TCP=3306
@@ -38,6 +37,9 @@ services:
       - MAUTIC_VERSION=3.2.5
       - MAUTIC_RUN_CRON_JOBS=false
       - COMPOSER_DEBUG_EVENTS=1
+      - VIRTUAL_HOST=tipsy.rexvideo.io
+      - VIRTUAL_PORT=8089
+      - LETSENCRYPT_HOST=tipsy.rexvideo.io
     networks:
       - mautic-net
 #    logging:
