@@ -49,19 +49,15 @@ class RandomSmtpTransport extends \Swift_SmtpTransport
      */
     public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
-        error_log('**** Starting send! ***** ');
-//            $transport = new \Swift_SmtpTransport('alpha.rexvideo.io', 587, 'tls')
         $transport = (new \Swift_SmtpTransport('localhost'))
-//            $transport = (new \Swift_SmtpTransport('alpha.rexvideo.io', 587, 'tls'))
-//                ->setUsername('hi@alpha.rexvideo.io')
-//                ->setPassword('fuckyeah')
                 ->setStreamOptions(['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]]);
-//            $transport->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false)));
-        error_log('**** Starting 2**** ');
-//            var_dump($transport);
 
         $this->setRandomSmtpServer($message, $transport);
-        $mailer = new \Swift_Mailer($transport);
+        $mailer         = new \Swift_Mailer($transport);
+        $mailbotAddress = $transport->getUsername();
+        $message->getHeaders()->addTextHeader('Sender', $mailbotAddress);
+        $message->getHeaders()->addTextHeader('X-Sender', $mailbotAddress);
+        $message->getHeaders()->addTextHeader('Return-Path', $mailbotAddress);
         $mailer->send($message, $failedRecipients);
     }
 
@@ -72,10 +68,6 @@ class RandomSmtpTransport extends \Swift_SmtpTransport
      */
     private function setRandomSmtpServer(\Swift_Mime_SimpleMessage &$message = null, &$transport)
     {
-        error_log('Setting random');
-
-//        var_dump($message);
-//        var_dump($transport);
         try {
             $this->smtpRandomizer->randomize($transport, $message);
             $this->logger->info(sprintf('Send by random SMTP server: %s with username %s and sender email %s to %s', $this->getHost(), $this->getUsername(), implode(',', $message ? array_keys($message->getFrom()) : []), $message ? implode(', ', array_keys($message->getTo())) : ''));
