@@ -89,7 +89,7 @@ COPY composer.json composer.json
 RUN composer install
 RUN chown -R www-data:www-data .
 
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+#ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 COPY --chown=www-data:www-data . .
 COPY docker-entrypoint.sh /entrypoint.sh

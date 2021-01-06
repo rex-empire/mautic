@@ -14,7 +14,7 @@ services:
     command:
       --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
     networks:
-      - mautic-net
+      - rex
 
   mautic:
     build: .
@@ -42,7 +42,7 @@ services:
       - VIRTUAL_PORT=8091
       - LETSENCRYPT_HOST=tipsy.rexvideo.io
     networks:
-      - mautic-net
+      - rex
 #    logging:
 #      driver: gelf
 #      options:
@@ -56,6 +56,6 @@ volumes:
     driver: local
 
 networks:
-  mautic-net:
-    driver: bridge
-
+  default:
+    external:
+      name: rex
