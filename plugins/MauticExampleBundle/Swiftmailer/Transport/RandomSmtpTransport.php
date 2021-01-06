@@ -49,10 +49,11 @@ class RandomSmtpTransport extends \Swift_SmtpTransport
      */
     public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
-        $transport = (new \Swift_SmtpTransport('localhost'))
-                ->setStreamOptions(['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]]);
+        $transport = (new \Swift_SmtpTransport('localhost'))->setStreamOptions(['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]]);
 
         $this->setRandomSmtpServer($message, $transport);
+        $transport->setStreamOptions(['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]]);
+
         $mailer         = new \Swift_Mailer($transport);
         $mailbotAddress = $transport->getUsername();
         $message->getHeaders()->addTextHeader('Sender', $mailbotAddress);
