@@ -13,8 +13,6 @@ services:
       - MYSQL_ROOT_PASSWORD=mysecret
     command:
       --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-    networks:
-      - rex
 
   mautic:
     build: .
@@ -35,14 +33,11 @@ services:
       - MAUTIC_DB_NAME=mautic
       - MAUTIC_ENV=dev
       - MAUTIC_VERSION=3.2.5
-      - MAUTIC_RUN_CRON_JOBS=false
-      - MAUTIC_TRUSTED_PROXIES=0.0.0.0/0
+      - MAUTIC_RUN_CRON_JOBS=true
       - COMPOSER_DEBUG_EVENTS=1
       - VIRTUAL_HOST=tipsy.rexvideo.io
       - VIRTUAL_PORT=8091
       - LETSENCRYPT_HOST=tipsy.rexvideo.io
-    networks:
-      - rex
 #    logging:
 #      driver: gelf
 #      options:
@@ -58,4 +53,4 @@ volumes:
 networks:
   default:
     external:
-      name: rex
+      name: big-daddy_rex
