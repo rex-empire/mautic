@@ -272,13 +272,9 @@ MauticJS.initGatedVideo = function () {
     MauticJS.mauticInsertedScripts = MauticJS.mauticInsertedScripts || {};
     
     if ("undefined" == typeof jQuery && "undefined" == typeof MauticJS.mauticInsertedScripts.jQuery) {
-        MauticJS.insertScript('{$jQueryUrl}');
-        MauticJS.mauticInsertedScripts.jQuery = true;
     }
 
     if ("undefined" == typeof Froogaloop && "undefined" == typeof MauticJS.mauticInsertedScripts.Froogaloop) {
-        MauticJS.insertScript('https://f.vimeocdn.com/js/froogaloop2.min.js');
-        MauticJS.mauticInsertedScripts.Froogaloop = true;
     }
     
     if ("undefined" == typeof jQuery || "undefined" == typeof Froogaloop) {
